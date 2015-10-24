@@ -14,14 +14,19 @@ class CassandraDB {
 	val Cluster cluster
 	val Session session
 	val Mapper<User> userMapper
+	val MappingManager manager
 	
-	new (String node) {
+	UserAccessor accessor
+
+	new(String node) {
 		this.cluster = Cluster.builder().addContactPoint(node).build()
 		logMetadata()
 		this.session = this.cluster.connect()
-		userMapper = new MappingManager(this.session).mapper(User);
+		manager = new MappingManager(this.session)
+		userMapper = (manager).mapper(User);
+		accessor = manager.createAccessor(UserAccessor)
 	}
-	
+
 	def logMetadata() {
 		var Metadata metadata = cluster.getMetadata()
 		System.out.printf("Connecting to cluster: %s\n", metadata.getClusterName())
@@ -37,6 +42,10 @@ class CassandraDB {
 
 	def saveUser(User user) {
 		userMapper.save(user)
+	}
+
+	def findUsers() {
+		accessor.all
 	}
 
 }

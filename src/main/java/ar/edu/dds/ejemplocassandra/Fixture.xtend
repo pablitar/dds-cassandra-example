@@ -75,6 +75,7 @@ class Fixture {
 	
 	def static void main(String[] args) {
 		new Fixture().createUsers().forEach[CassandraDB.INSTANCE.saveUser(it)]
+		CassandraDB.INSTANCE.close
 	}
 	
 
